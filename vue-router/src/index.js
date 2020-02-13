@@ -1,5 +1,3 @@
-/* @flow */
-
 import { install } from './install';
 import { START } from './util/route';
 import { assert } from './util/warn';
@@ -13,26 +11,8 @@ import { HashHistory } from './history/hash';
 import { HTML5History } from './history/html5';
 import { AbstractHistory } from './history/abstract';
 
-import type { Matcher } from './create-matcher';
-
 export default class VueRouter {
-    static install: () => void;
-    static version: string;
-
-    app: any;
-    apps: Array<any>;
-    ready: boolean;
-    readyCbs: Array<Function>;
-    options: RouterOptions;
-    mode: string;
-    history: HashHistory | HTML5History | AbstractHistory;
-    matcher: Matcher;
-    fallback: boolean;
-    beforeHooks: Array<?NavigationGuard>;
-    resolveHooks: Array<?NavigationGuard>;
-    afterHooks: Array<?AfterNavigationHook>;
-
-    constructor(options: RouterOptions = {}) {
+    constructor(options = {}) {
         this.app = null;
         this.apps = [];
         this.options = options;
@@ -68,15 +48,15 @@ export default class VueRouter {
         }
     }
 
-    match(raw: RawLocation, current?: Route, redirectedFrom?: Location): Route {
+    match(raw, current, redirectedFrom) {
         return this.matcher.match(raw, current, redirectedFrom);
     }
 
-    get currentRoute(): ?Route {
+    get currentRoute() {
         return this.history && this.history.current;
     }
 
-    init(app: any /* Vue component instance */) {
+    init(app /* Vue component instance */) {
         process.env.NODE_ENV !== 'production' &&
             assert(
                 install.installed,
@@ -127,27 +107,27 @@ export default class VueRouter {
         });
     }
 
-    beforeEach(fn: Function): Function {
+    beforeEach(fn) {
         return registerHook(this.beforeHooks, fn);
     }
 
-    beforeResolve(fn: Function): Function {
+    beforeResolve(fn) {
         return registerHook(this.resolveHooks, fn);
     }
 
-    afterEach(fn: Function): Function {
+    afterEach(fn) {
         return registerHook(this.afterHooks, fn);
     }
 
-    onReady(cb: Function, errorCb?: Function) {
+    onReady(cb, errorCb) {
         this.history.onReady(cb, errorCb);
     }
 
-    onError(errorCb: Function) {
+    onError(errorCb) {
         this.history.onError(errorCb);
     }
 
-    push(location: RawLocation, onComplete?: Function, onAbort?: Function) {
+    push(location, onComplete, onAbort) {
         // $flow-disable-line
         if (!onComplete && !onAbort && typeof Promise !== 'undefined') {
             return new Promise((resolve, reject) => {
@@ -158,7 +138,7 @@ export default class VueRouter {
         }
     }
 
-    replace(location: RawLocation, onComplete?: Function, onAbort?: Function) {
+    replace(location, onComplete, onAbort) {
         // $flow-disable-line
         if (!onComplete && !onAbort && typeof Promise !== 'undefined') {
             return new Promise((resolve, reject) => {
@@ -169,7 +149,7 @@ export default class VueRouter {
         }
     }
 
-    go(n: number) {
+    go(n) {
         this.history.go(n);
     }
 
@@ -181,8 +161,8 @@ export default class VueRouter {
         this.go(1);
     }
 
-    getMatchedComponents(to?: RawLocation | Route): Array<any> {
-        const route: any = to ? (to.matched ? to : this.resolve(to).route) : this.currentRoute;
+    getMatchedComponents(to) {
+        const route = to ? (to.matched ? to : this.resolve(to).route) : this.currentRoute;
         if (!route) {
             return [];
         }
@@ -196,18 +176,7 @@ export default class VueRouter {
         );
     }
 
-    resolve(
-        to: RawLocation,
-        current?: Route,
-        append?: boolean
-    ): {
-        location: Location,
-        route: Route,
-        href: string,
-        // for backwards compat
-        normalizedTo: Location,
-        resolved: Route
-    } {
+    resolve(to, current, append) {
         current = current || this.history.current;
         const location = normalizeLocation(to, current, append, this);
         const route = this.match(location, current);
@@ -224,7 +193,7 @@ export default class VueRouter {
         };
     }
 
-    addRoutes(routes: Array<RouteConfig>) {
+    addRoutes(routes) {
         this.matcher.addRoutes(routes);
         if (this.history.current !== START) {
             this.history.transitionTo(this.history.getCurrentLocation());
@@ -232,7 +201,7 @@ export default class VueRouter {
     }
 }
 
-function registerHook(list: Array<any>, fn: Function): Function {
+function registerHook(list, fn) {
     list.push(fn);
     return () => {
         const i = list.indexOf(fn);
@@ -240,7 +209,7 @@ function registerHook(list: Array<any>, fn: Function): Function {
     };
 }
 
-function createHref(base: string, fullPath: string, mode) {
+function createHref(base, fullPath, mode) {
     var path = mode === 'hash' ? '#' + fullPath : fullPath;
     return base ? cleanPath(base + '/' + path) : path;
 }

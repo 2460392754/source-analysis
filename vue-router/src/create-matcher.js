@@ -1,6 +1,5 @@
-/* @flow */
+/*       */
 
-import type VueRouter from './index';
 import { resolvePath } from './util/path';
 import { assert, warn } from './util/warn';
 import { createRoute } from './util/route';
@@ -8,19 +7,14 @@ import { fillParams } from './util/params';
 import { createRouteMap } from './create-route-map';
 import { normalizeLocation } from './util/location';
 
-export type Matcher = {
-    match: (raw: RawLocation, current?: Route, redirectedFrom?: Location) => Route,
-    addRoutes: (routes: Array<RouteConfig>) => void
-};
-
-export function createMatcher(routes: Array<RouteConfig>, router: VueRouter): Matcher {
+export function createMatcher(routes, router) {
     const { pathList, pathMap, nameMap } = createRouteMap(routes);
 
     function addRoutes(routes) {
         createRouteMap(routes, pathList, pathMap, nameMap);
     }
 
-    function match(raw: RawLocation, currentRoute?: Route, redirectedFrom?: Location): Route {
+    function match(raw, currentRoute, redirectedFrom) {
         const location = normalizeLocation(raw, currentRoute, false, router);
         const { name } = location;
 
@@ -62,7 +56,7 @@ export function createMatcher(routes: Array<RouteConfig>, router: VueRouter): Ma
         return _createRoute(null, location);
     }
 
-    function redirect(record: RouteRecord, location: Location): Route {
+    function redirect(record, location) {
         const originalRedirect = record.redirect;
         let redirect =
             typeof originalRedirect === 'function'
@@ -80,7 +74,7 @@ export function createMatcher(routes: Array<RouteConfig>, router: VueRouter): Ma
             return _createRoute(null, location);
         }
 
-        const re: Object = redirect;
+        const re = redirect;
         const { name, path } = re;
         let { query, hash, params } = location;
         query = re.hasOwnProperty('query') ? re.query : query;
@@ -132,7 +126,7 @@ export function createMatcher(routes: Array<RouteConfig>, router: VueRouter): Ma
         }
     }
 
-    function alias(record: RouteRecord, location: Location, matchAs: string): Route {
+    function alias(record, location, matchAs) {
         const aliasedPath = fillParams(
             matchAs,
             location.params,
@@ -151,11 +145,7 @@ export function createMatcher(routes: Array<RouteConfig>, router: VueRouter): Ma
         return _createRoute(null, location);
     }
 
-    function _createRoute(
-        record: ?RouteRecord,
-        location: Location,
-        redirectedFrom?: Location
-    ): Route {
+    function _createRoute(record, location, redirectedFrom) {
         if (record && record.redirect) {
             return redirect(record, redirectedFrom || location);
         }
@@ -171,7 +161,7 @@ export function createMatcher(routes: Array<RouteConfig>, router: VueRouter): Ma
     };
 }
 
-function matchRoute(regex: RouteRegExp, path: string, params: Object): boolean {
+function matchRoute(regex, path, params) {
     const m = path.match(regex);
 
     if (!m) {
@@ -192,6 +182,6 @@ function matchRoute(regex: RouteRegExp, path: string, params: Object): boolean {
     return true;
 }
 
-function resolveRecordPath(path: string, record: RouteRecord): string {
+function resolveRecordPath(path, record) {
     return resolvePath(path, record.parent ? record.parent.path : '/', true);
 }

@@ -1,22 +1,19 @@
-/* @flow */
-import { inBrowser } from './dom'
+/*       */
+import { inBrowser } from './dom';
 
 // use User Timing api (if present) for more accurate key precision
-const Time =
-  inBrowser && window.performance && window.performance.now
-    ? window.performance
-    : Date
+const Time = inBrowser && window.performance && window.performance.now ? window.performance : Date;
 
-export function genStateKey (): string {
-  return Time.now().toFixed(3)
+export function genStateKey() {
+    return Time.now().toFixed(3);
 }
 
-let _key: string = genStateKey()
+let _key = genStateKey();
 
-export function getStateKey () {
-  return _key
+export function getStateKey() {
+    return _key;
 }
 
-export function setStateKey (key: string) {
-  return (_key = key)
+export function setStateKey(key) {
+    return (_key = key);
 }

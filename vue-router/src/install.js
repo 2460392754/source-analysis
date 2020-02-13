@@ -4,22 +4,29 @@ import Link from './components/link';
 export let _Vue;
 
 export function install(Vue) {
+    // 防止 vue-router 插件重复注册
     if (install.installed && _Vue === Vue) return;
     install.installed = true;
 
     _Vue = Vue;
 
+    // 判断参数是否 不是undefined
     const isDef = (v) => v !== undefined;
 
+    // 注册实例
     const registerInstance = (vm, callVal) => {
         let i = vm.$options._parentVnode;
+
+        // 判断 vm.$options._parentVnode.data.registerRouteInstance 这个链式属性存在并且不为 undefined
         if (isDef(i) && isDef((i = i.data)) && isDef((i = i.registerRouteInstance))) {
             i(vm, callVal);
         }
     };
 
+    // 注册一个全局混入
     Vue.mixin({
         beforeCreate() {
+            // 首次混入到beforeCreate里
             if (isDef(this.$options.router)) {
                 this._routerRoot = this;
                 this._router = this.$options.router;

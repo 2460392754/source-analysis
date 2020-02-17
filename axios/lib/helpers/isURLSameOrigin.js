@@ -3,24 +3,24 @@
 var utils = require('./../utils');
 
 module.exports = utils.isStandardBrowserEnv()
-    ? // Standard browser envs have full support of the APIs needed to test
-      // whether the request URL is of the same origin as current location.
+    ? // 标准浏览器环境
       (function standardBrowserEnv() {
+          // 是否是ie浏览器
           var msie = /(msie|trident)/i.test(navigator.userAgent);
           var urlParsingNode = document.createElement('a');
           var originURL;
 
           /**
-           * Parse a URL to discover it's components
+           * 获取`window.location`上面的属性
            *
-           * @param {String} url The URL to be parsed
+           * @param {String} url 需要解析的URL
            * @returns {Object}
            */
           function resolveURL(url) {
               var href = url;
 
+              // IE浏览器需要设置2遍(暂时没找到解释的文章和资料)
               if (msie) {
-                  // IE needs attribute set twice to normalize properties
                   urlParsingNode.setAttribute('href', href);
                   href = urlParsingNode.href;
               }
@@ -48,17 +48,17 @@ module.exports = utils.isStandardBrowserEnv()
           originURL = resolveURL(window.location.href);
 
           /**
-           * Determine if a URL shares the same origin as the current location
+           * 判断`requestURL`和当前环境是否是同源
            *
-           * @param {String} requestURL The URL to test
-           * @returns {boolean} True if URL shares the same origin, otherwise false
+           * @param {String} requestURL 需要测试的URL
+           * @returns {boolean} 是否同源
            */
           return function isURLSameOrigin(requestURL) {
               var parsed = utils.isString(requestURL) ? resolveURL(requestURL) : requestURL;
               return parsed.protocol === originURL.protocol && parsed.host === originURL.host;
           };
       })()
-    : // Non standard browser envs (web workers, react-native) lack needed support.
+    : // 非标准浏览器环境
       (function nonStandardBrowserEnv() {
           return function isURLSameOrigin() {
               return true;

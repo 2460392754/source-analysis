@@ -2,17 +2,17 @@
 
 var utils = require('./../utils');
 
+// 实例化后创建一个拦截器容器
 function InterceptorManager() {
     this.handlers = [];
 }
 
 /**
- * Add a new interceptor to the stack
+ * 添加新的拦截器
  *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
+ * @param {Function} fulfilled 处理`Promise`中的`resolve`回调
+ * @param {Function} rejected 处理`Promise`中的``reject`回调
+ * @return {Number} 返回一个注册拦截器后的容器索引，可以用于注销
  */
 InterceptorManager.prototype.use = function use(fulfilled, rejected) {
     this.handlers.push({
@@ -23,9 +23,9 @@ InterceptorManager.prototype.use = function use(fulfilled, rejected) {
 };
 
 /**
- * Remove an interceptor from the stack
+ * 注销拦截器
  *
- * @param {Number} id The ID that was returned by `use`
+ * @param {Number} id 注册后返回的索引id
  */
 InterceptorManager.prototype.eject = function eject(id) {
     if (this.handlers[id]) {
@@ -34,15 +34,13 @@ InterceptorManager.prototype.eject = function eject(id) {
 };
 
 /**
- * Iterate over all the registered interceptors
+ * 遍历容器中所有的拦截器
  *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
+ * @param {Function} fn 每次遍历时运行的回调函数
  */
 InterceptorManager.prototype.forEach = function forEach(fn) {
     utils.forEach(this.handlers, function forEachHandler(h) {
+        // 跳过已注销的对象
         if (h !== null) {
             fn(h);
         }

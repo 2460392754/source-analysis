@@ -5,9 +5,7 @@ var transformData = require('./transformData');
 var isCancel = require('../cancel/isCancel');
 var defaults = require('../defaults');
 
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
+// 如果已取消请求，则抛出取消请求的消息内容
 function throwIfCancellationRequested(config) {
     if (config.cancelToken) {
         config.cancelToken.throwIfRequested();
@@ -17,25 +15,26 @@ function throwIfCancellationRequested(config) {
 /**
  * Dispatch a request to the server using the configured adapter.
  *
- * @param {object} config The config that is to be used for the request
+ * @param {object} config 用于发送请求的配置数据
  * @returns {Promise} The Promise to be fulfilled
  */
 module.exports = function dispatchRequest(config) {
     throwIfCancellationRequested(config);
 
-    // Ensure headers exist
+    // 添加默认值为空对象，防止代码运行出现错误
     config.headers = config.headers || {};
 
-    // Transform request data
+    // 获取转换后的`data`数据
     config.data = transformData(config.data, config.headers, config.transformRequest);
 
-    // Flatten headers
+    // 合并`headers`数据
     config.headers = utils.merge(
         config.headers.common || {},
         config.headers[config.method] || {},
         config.headers || {}
     );
 
+    // 删除`headers`中配置的自定义`method`属性数据
     utils.forEach(
         ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
         function cleanHeaderConfig(method) {

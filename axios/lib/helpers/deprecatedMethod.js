@@ -1,14 +1,11 @@
 'use strict';
 
-/*eslint no-console:0*/
-
 /**
- * Supply a warning to the developer that a method they are using
- * has been deprecated.
+ * 浏览器控制台打印出已弃用方法的警告内容
  *
- * @param {string} method The name of the deprecated method
- * @param {string} [instead] The alternate method to use if applicable
- * @param {string} [docs] The documentation URL to get further details
+ * @param {string} method 已弃用的方法
+ * @param {string} [instead] 可以的替代方法
+ * @param {string} [docs] 获取更多详细信息的文档URL
  */
 module.exports = function deprecatedMethod(method, instead, docs) {
     try {

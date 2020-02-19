@@ -69,7 +69,7 @@ module.exports = function xhrAdapter(config) {
                     ? parseHeaders(request.getAllResponseHeaders()) // 解析`headers`字符串转换为对象
                     : null;
 
-            // 获取响应值，`config.responseType`为'null'或'text'，则返回`request.responseText`
+            // 获取响应值，判断`config.responseType`是否为'null'、'undefined'、'text'
             var responseData =
                 !config.responseType || config.responseType === 'text'
                     ? request.responseText
@@ -106,6 +106,7 @@ module.exports = function xhrAdapter(config) {
         };
 
         // 处理错误请求（网络错误）
+        // TODO：axios 中 xhr.onerror 处理机制问题
         request.onerror = function handleError() {
             // Real errors are hidden from us by the browser
             // onerror should only fire if it's a network error
@@ -134,8 +135,9 @@ module.exports = function xhrAdapter(config) {
         if (utils.isStandardBrowserEnv()) {
             var cookies = require('./../helpers/cookies');
 
-            // Add xsrf header
+            // xsrf的`cookie`键值
             var xsrfValue =
+                // 判读是否已添加跨域请求凭证，没有再判断是否同源，最后再判断是否在配置中添加了`xsrfCookieName`字段名擦
                 (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName
                     ? cookies.read(config.xsrfCookieName)
                     : undefined;
@@ -185,15 +187,15 @@ module.exports = function xhrAdapter(config) {
             request.upload.addEventListener('progress', config.onUploadProgress);
         }
 
-        // 处理取消请求
+        // 处理终止请求
         if (config.cancelToken) {
-            // 处理 请求处理回调
+            // 处理 调用终止请求后的Promise回调
             config.cancelToken.promise.then(function onCanceled(cancel) {
                 if (!request) {
                     return;
                 }
 
-                // 停止请求发送
+                // 终止请求
                 request.abort();
 
                 reject(cancel);

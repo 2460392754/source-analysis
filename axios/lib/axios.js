@@ -16,7 +16,7 @@ function createInstance(defaultConfig) {
     // 实例化一个axios
     var context = new Axios(defaultConfig);
 
-    // 获取`Axios.prototype.request`修改this指向后并继承`context`参数后返回的函数 （单例）
+    // 获取`Axios.prototype.request`修改this指向后并继承`context`参数后，返回闭包函数
     var instance = bind(Axios.prototype.request, context);
 
     // 把`Axios.prototype`上的参数遍历合并到`instance`上，如果是方法就会把`this`指向为`context`,并返回一个新的方法
@@ -35,7 +35,7 @@ var axios = createInstance(defaults);
 // 暴露一个Axios类，方便开发者进行扩展
 axios.Axios = Axios;
 
-// 使用工厂函数创建一个带有默认配置的`axios`实例对象
+// 使用工厂模式创建一个带有默认配置的`axios`实例对象
 axios.create = function create(instanceConfig) {
     return createInstance(mergeConfig(axios.defaults, instanceConfig));
 };

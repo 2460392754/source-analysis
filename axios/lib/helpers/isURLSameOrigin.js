@@ -27,7 +27,7 @@ module.exports = utils.isStandardBrowserEnv()
 
               urlParsingNode.setAttribute('href', href);
 
-              // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+              // 封装了一些对象
               return {
                   href: urlParsingNode.href,
                   protocol: urlParsingNode.protocol

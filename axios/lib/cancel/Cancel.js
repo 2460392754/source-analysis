@@ -10,7 +10,7 @@ function Cancel(message) {
     this.message = message;
 }
 
-// `Cancel`函数上扩展方法
+// `Cancel`函数重新了`toString`方法
 Cancel.prototype.toString = function toString() {
     return 'Cancel' + (this.message ? ': ' + this.message : '');
 };

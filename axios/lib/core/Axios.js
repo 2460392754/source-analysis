@@ -71,7 +71,7 @@ Axios.prototype.request = function request(config) {
     });
 
     // 遍历容器，改成Promise执行链
-    // 执行顺序，请求拦截器 > 发送请求 > 响应拦截器
+    // 执行顺序，请求拦截器 > 请求适配器 > 响应拦截器
     while (chain.length) {
         promise = promise.then(chain.shift(), chain.shift());
     }

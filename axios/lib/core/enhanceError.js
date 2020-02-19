@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * 增强显示错误
+ * 增强错误内容
  *
  * @param {Error} error `Error`实例化对象
  * @param {Object} config 抛出错误时的`config`数据
@@ -37,7 +37,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
             columnNumber: this.columnNumber,
             stack: this.stack,
 
-            // Axios的配置信息
+            // 扩展的数据
             config: this.config,
             code: this.code
         };

@@ -3,10 +3,6 @@
 var bind = require('./helpers/bind');
 var isBuffer = require('is-buffer');
 
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
 var toString = Object.prototype.toString;
 
 /**
@@ -286,7 +282,7 @@ function deepMerge(/* obj1, obj2, obj3, ... */) {
  */
 function extend(a, b, thisArg) {
     forEach(b, function assignValue(val, key) {
-        // `thisArg`存在并且val是函数
+        // `thisArg`存在并且`val`是函数
         if (thisArg && typeof val === 'function') {
             a[key] = bind(val, thisArg);
         } else {

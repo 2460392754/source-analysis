@@ -15,6 +15,7 @@ function CancelToken(executor) {
     }
 
     var resolvePromise;
+    // 添加了一个 状态为`pending`的`promise`实例对象
     this.promise = new Promise(function promiseExecutor(resolve) {
         resolvePromise = resolve;
     });
@@ -33,7 +34,7 @@ function CancelToken(executor) {
 }
 
 /**
- * 如果已取消请求，则抛出取消请求的消息内容
+ * 如果已终止请求，则抛出`Cancel`实例对象
  */
 CancelToken.prototype.throwIfRequested = function throwIfRequested() {
     if (this.reason) {

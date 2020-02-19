@@ -13,7 +13,7 @@ function throwIfCancellationRequested(config) {
 }
 
 /**
- * Dispatch a request to the server using the configured adapter.
+ * 使用已配置的是配置发送请求到服务端
  *
  * @param {object} config 用于发送请求的配置数据
  * @returns {Promise} The Promise to be fulfilled
@@ -44,11 +44,12 @@ module.exports = function dispatchRequest(config) {
 
     var adapter = config.adapter || defaults.adapter;
 
+    // 调用发送请求函数，并添加Promise回调函数
     return adapter(config).then(
         function onAdapterResolution(response) {
             throwIfCancellationRequested(config);
 
-            // Transform response data
+            // 获取 转换响应数据
             response.data = transformData(
                 response.data,
                 response.headers,
@@ -57,11 +58,12 @@ module.exports = function dispatchRequest(config) {
 
             return response;
         },
+
         function onAdapterRejection(reason) {
             if (!isCancel(reason)) {
                 throwIfCancellationRequested(config);
 
-                // Transform response data
+                // 获取 转换响应数据
                 if (reason && reason.response) {
                     reason.response.data = transformData(
                         reason.response.data,

@@ -16,7 +16,8 @@ var enhanceError = require('../core/enhanceError');
 
 var isHttps = /https:?/;
 
-/*eslint consistent-return:0*/
+// TODO: 没写完
+
 module.exports = function httpAdapter(config) {
     return new Promise(function dispatchHttpRequest(resolvePromise, rejectPromise) {
         var timer;

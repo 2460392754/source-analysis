@@ -1,3 +1,6 @@
+/**
+ * 封装自定义路由导航错误类
+ */
 export class NavigationDuplicated extends Error {
     constructor(normalizedLocation) {
         super();

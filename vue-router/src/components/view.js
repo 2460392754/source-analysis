@@ -130,6 +130,11 @@ function fillPropsinData(component, data, route, configProps) {
     }
 }
 
+/**
+ *
+ * @param {*} route
+ * @param {*} config
+ */
 function resolveProps(route, config) {
     switch (typeof config) {
         case 'undefined':

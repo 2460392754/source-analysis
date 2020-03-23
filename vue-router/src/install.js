@@ -26,7 +26,7 @@ export function install(Vue) {
     // 注册一个全局混入
     Vue.mixin({
         beforeCreate() {
-            // 首次混入到beforeCreate里
+            // 首次全局混入到beforeCreate里
             if (isDef(this.$options.router)) {
                 this._routerRoot = this;
                 this._router = this.$options.router;
@@ -42,18 +42,21 @@ export function install(Vue) {
         }
     });
 
+    // 修改 `Vue.prototype.$router` get属性访问器
     Object.defineProperty(Vue.prototype, '$router', {
         get() {
             return this._routerRoot._router;
         }
     });
 
+    // 修改 `Vue.prototype.$route` get属性访问器
     Object.defineProperty(Vue.prototype, '$route', {
         get() {
             return this._routerRoot._route;
         }
     });
 
+    // 注册全局组件
     Vue.component('RouterView', View);
     Vue.component('RouterLink', Link);
 

@@ -1,14 +1,21 @@
-/*       */
-
 import { warn } from './warn';
 import Regexp from 'path-to-regexp';
 
-// $flow-disable-line
+// 创建一个纯净的空对象
 const regexpCompileCache = Object.create(null);
 
+/**
+ *
+ * @param {string} path
+ * @param {Object} params
+ * @param {string} routeMsg
+ */
 export function fillParams(path, params, routeMsg) {
+    // 添加默认值
     params = params || {};
+
     try {
+        // 封装 路径编译函数，并做缓存处理
         const filler =
             regexpCompileCache[path] || (regexpCompileCache[path] = Regexp.compile(path));
 
@@ -16,6 +23,7 @@ export function fillParams(path, params, routeMsg) {
         // and fix #3106 so that you can work with location descriptor object having params.pathMatch equal to empty string
         if (typeof params.pathMatch === 'string') params[0] = params.pathMatch;
 
+        // TODO: `pretty`参数文档中找不到介绍
         return filler(params, { pretty: true });
     } catch (e) {
         if (process.env.NODE_ENV !== 'production') {
@@ -27,6 +35,7 @@ export function fillParams(path, params, routeMsg) {
         }
         return '';
     } finally {
+        // TODO:为什么删除
         // delete the 0 if it was added
         delete params[0];
     }

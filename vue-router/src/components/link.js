@@ -1,14 +1,13 @@
-/*       */
-
 import { createRoute, isSameRoute, isIncludedRoute } from '../util/route';
 import { extend } from '../util/misc';
 import { normalizeLocation } from '../util/location';
 import { warn } from '../util/warn';
 
-// work around weird flow bug
+//// work around weird flow bug
 const toTypes = [String, Object];
 const eventTypes = [String, Array];
 
+// 空内容回调函数
 const noop = () => {};
 
 export default {
@@ -36,16 +35,26 @@ export default {
         const router = this.$router;
         const current = this.$route;
         const { location, route, href } = router.resolve(this.to, current, this.append);
-
         const classes = {};
+
+        // 获取 全局激活样式
         const globalActiveClass = router.options.linkActiveClass;
+
+        // 获取 全局精确匹配激活样式
         const globalExactActiveClass = router.options.linkExactActiveClass;
-        // Support global empty active class
+
+        // 设置 默认全局激活样式
         const activeClassFallback =
             globalActiveClass == null ? 'router-link-active' : globalActiveClass;
+
+        // 设置 默认全局精确匹配激活样式
         const exactActiveClassFallback =
             globalExactActiveClass == null ? 'router-link-exact-active' : globalExactActiveClass;
+
+        // 设置 激活样式，优先级：私有 > 全局
         const activeClass = this.activeClass == null ? activeClassFallback : this.activeClass;
+
+        // 设置 精确匹配激活样式，优先级：私有 > 全局
         const exactActiveClass =
             this.exactActiveClass == null ? exactActiveClassFallback : this.exactActiveClass;
 
@@ -58,6 +67,7 @@ export default {
             ? classes[exactActiveClass]
             : isIncludedRoute(current, compareTarget);
 
+        // 封装 事件处理
         const handler = (e) => {
             if (guardEvent(e)) {
                 if (this.replace) {
@@ -68,7 +78,10 @@ export default {
             }
         };
 
+        // 添加默认的click事件
         const on = { click: guardEvent };
+
+        // 绑定事件
         if (Array.isArray(this.event)) {
             this.event.forEach((e) => {
                 on[e] = handler;
@@ -77,8 +90,10 @@ export default {
             on[this.event] = handler;
         }
 
+        // render函数默认参数
         const data = { class: classes };
 
+        // 设置 作用域插槽
         const scopedSlot =
             !this.$scopedSlots.$hasNormal &&
             this.$scopedSlots.default &&
@@ -90,9 +105,12 @@ export default {
                 isExactActive: classes[exactActiveClass]
             });
 
+        // 处理 作用域插槽
         if (scopedSlot) {
             if (scopedSlot.length === 1) {
                 return scopedSlot[0];
+
+                //
             } else if (scopedSlot.length > 1 || !scopedSlot.length) {
                 if (process.env.NODE_ENV !== 'production') {
                     warn(
@@ -104,6 +122,7 @@ export default {
             }
         }
 
+        // 如果没有设置自定义渲染标签
         if (this.tag === 'a') {
             data.on = on;
             data.attrs = { href };
@@ -144,22 +163,37 @@ export default {
     }
 };
 
+/**
+ * 守卫事件
+ * @param {Evnet} e 事件回调
+ * @returns {boolean} 事件能否继续执行
+ */
 function guardEvent(e) {
-    // don't redirect with control keys
+    //// don't redirect with control keys
+    // 不能按下特殊键，再点击事件
     if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) return;
-    // don't redirect when preventDefault called
+
+    //// don't redirect when preventDefault called
+    // 事件的默认动作不能被取消
     if (e.defaultPrevented) return;
-    // don't redirect on right click
+
+    //// don't redirect on right click
+    // 不能右键点击
     if (e.button !== undefined && e.button !== 0) return;
-    // don't redirect if `target="_blank"`
+
+    //// don't redirect if `target="_blank"`
+    // 选项不能是打开新窗口
     if (e.currentTarget && e.currentTarget.getAttribute) {
         const target = e.currentTarget.getAttribute('target');
         if (/\b_blank\b/i.test(target)) return;
     }
-    // this may be a Weex event which doesn't have this method
+
+    //// this may be a Weex event which doesn't have this method
+    // 判断兼容性
     if (e.preventDefault) {
         e.preventDefault();
     }
+
     return true;
 }
 

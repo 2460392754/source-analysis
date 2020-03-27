@@ -1,14 +1,12 @@
 'use strict';
 
 /**
- * Determines whether the specified URL is absolute
+ * 判断URL是否是绝对地址
  *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
+ * @param {string} url 被测试的URL
+ * @returns {boolean} 是否是绝对地址
  */
 module.exports = function isAbsoluteURL(url) {
-    // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-    // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-    // by any combination of letters, digits, plus, period, or hyphen.
+    // 正则匹配判断，URL是否为以协议开头(头部协议里包含'//'或'://')，例如'http://'
     return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };

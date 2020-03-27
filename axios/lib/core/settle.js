@@ -3,14 +3,16 @@
 var createError = require('./createError');
 
 /**
- * Resolve or reject a Promise based on response status.
+ * 验证http状态码
  *
- * @param {Function} resolve A function that resolves the promise.
- * @param {Function} reject A function that rejects the promise.
- * @param {object} response The response.
+ * @param {Function} resolve `Promise`的`resolve`的回调函数
+ * @param {Function} reject `Promise`的`reject`的回调函数
+ * @param {object} response 请求的响应内容
  */
 module.exports = function settle(resolve, reject, response) {
     var validateStatus = response.config.validateStatus;
+
+    // 运行自定义验证http状态码函数
     if (!validateStatus || validateStatus(response.status)) {
         resolve(response);
     } else {

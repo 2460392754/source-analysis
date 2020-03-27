@@ -3,10 +3,6 @@
 var bind = require('./helpers/bind');
 var isBuffer = require('is-buffer');
 
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
 var toString = Object.prototype.toString;
 
 /**
@@ -146,7 +142,7 @@ function isStream(val) {
 }
 
 /**
- * Determine if a value is a URLSearchParams object
+ * 判断对象是否是`URLSearchParams`类型
  *
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a URLSearchParams object, otherwise false
@@ -156,7 +152,7 @@ function isURLSearchParams(val) {
 }
 
 /**
- * Trim excess whitespace off the beginning and end of a string
+ * 去除字符串开头和结尾多余的空格
  *
  * @param {String} str The String to trim
  * @returns {String} The String freed of excess whitespace
@@ -166,19 +162,10 @@ function trim(str) {
 }
 
 /**
- * Determine if we're running in a standard browser environment
- *
- * This allows axios to run in a web worker, and react-native.
- * Both environments support XMLHttpRequest, but not fully standard globals.
- *
- * web workers:
- *  typeof window -> undefined
- *  typeof document -> undefined
- *
- * react-native:
- *  navigator.product -> 'ReactNative'
- * nativescript
- *  navigator.product -> 'NativeScript' or 'NS'
+ * 是否是在标准浏览器环境中
+ * `web workers`环境里, `window`和`document`字段为`undefined`
+ * `react-native`环境里, `navigator.product`字段为'ReactNative'
+ * `nativescript`环境里, `navigator.product`字段为'NativeScript'或'NS'
  */
 function isStandardBrowserEnv() {
     if (
@@ -189,40 +176,34 @@ function isStandardBrowserEnv() {
     ) {
         return false;
     }
+
     return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
 /**
- * Iterate over an Array or an Object invoking a function for each item.
+ * 遍历对象并运行回调函数
  *
- * If `obj` is an Array callback will be called passing
- * the value, index, and complete array for each item.
- *
- * If 'obj' is an Object callback will be called passing
- * the value, key, and complete object for each property.
- *
- * @param {Object|Array} obj The object to iterate
- * @param {Function} fn The callback to invoke for each item
+ * @param {Object|Array} obj 需要迭代的对象
+ * @param {Function} fn 每次迭代时调用的回调函数
  */
 function forEach(obj, fn) {
-    // Don't bother if no value provided
+    // 没有值就直接返回空
     if (obj === null || typeof obj === 'undefined') {
         return;
     }
 
-    // Force an array if not already something iterable
+    // 如果为不为`Object`或者`Array`，则转换为数组类型
     if (typeof obj !== 'object') {
-        /*eslint no-param-reassign:0*/
         obj = [obj];
     }
 
     if (isArray(obj)) {
-        // Iterate over array values
+        // 遍历数组
         for (var i = 0, l = obj.length; i < l; i++) {
             fn.call(null, obj[i], i, obj);
         }
     } else {
-        // Iterate over object keys
+        // 遍历对象
         for (var key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
                 fn.call(null, obj[key], key, obj);
@@ -232,13 +213,7 @@ function forEach(obj, fn) {
 }
 
 /**
- * Accepts varargs expecting each argument to be an object, then
- * immutably merges the properties of each object and returns result.
- *
- * When multiple objects contain the same key the later object in
- * the arguments list will take precedence.
- *
- * Example:
+ * 拷贝合并
  *
  * ```js
  * var result = merge({foo: 123}, {foo: 456});
@@ -250,6 +225,8 @@ function forEach(obj, fn) {
  */
 function merge(/* obj1, obj2, obj3, ... */) {
     var result = {};
+
+    // 拷贝 + 递归
     function assignValue(val, key) {
         if (typeof result[key] === 'object' && typeof val === 'object') {
             result[key] = merge(result[key], val);
@@ -258,6 +235,7 @@ function merge(/* obj1, obj2, obj3, ... */) {
         }
     }
 
+    // 遍历 参数列表
     for (var i = 0, l = arguments.length; i < l; i++) {
         forEach(arguments[i], assignValue);
     }
@@ -266,15 +244,16 @@ function merge(/* obj1, obj2, obj3, ... */) {
 }
 
 /**
- * Function equal to merge with the difference being that no reference
- * to original objects is kept.
+ * 深拷贝合并
  *
  * @see merge
- * @param {Object} obj1 Object to merge
- * @returns {Object} Result of all merge properties
+ * @param {Object} obj1 需要合并的参数列表
+ * @returns {Object} 返回一个新的已合并的对象
  */
 function deepMerge(/* obj1, obj2, obj3, ... */) {
     var result = {};
+
+    // 拷贝 + 递归
     function assignValue(val, key) {
         if (typeof result[key] === 'object' && typeof val === 'object') {
             result[key] = deepMerge(result[key], val);
@@ -285,22 +264,25 @@ function deepMerge(/* obj1, obj2, obj3, ... */) {
         }
     }
 
+    // 遍历 参数列表
     for (var i = 0, l = arguments.length; i < l; i++) {
         forEach(arguments[i], assignValue);
     }
+
     return result;
 }
 
 /**
- * Extends object a by mutably adding to it the properties of object b.
+ * 动态扩展对象`a`的属性或方法
  *
- * @param {Object} a The object to be extended
- * @param {Object} b The object to copy properties from
- * @param {Object} thisArg The object to bind function to
- * @return {Object} The resulting value of object a
+ * @param {Object} a 需要扩展的对象
+ * @param {Object} b 被遍历复制的对象
+ * @param {Object} thisArg 修改方法`this`指向的对象
+ * @return {Object} 返回扩展后的对象`a`
  */
 function extend(a, b, thisArg) {
     forEach(b, function assignValue(val, key) {
+        // `thisArg`存在并且`val`是函数
         if (thisArg && typeof val === 'function') {
             a[key] = bind(val, thisArg);
         } else {

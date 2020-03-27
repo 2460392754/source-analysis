@@ -1,21 +1,13 @@
 'use strict';
 
 /**
- * Syntactic sugar for invoking a function and expanding an array for arguments.
+ * 封装`Function.prototype.apply`功能
  *
- * Common use case would be to use `Function.prototype.apply`.
- *
- *  ```js
- *  function f(x, y, z) {}
- *  var args = [1, 2, 3];
- *  f.apply(null, args);
- *  ```
- *
- * With `spread` this example can be re-written.
- *
- *  ```js
- *  spread(function(x, y, z) {})([1, 2, 3]);
- *  ```
+ * ``` js
+ * spread(function(a,b){
+ *      return a + b;
+ * }) ([1, 2])
+ * ```
  *
  * @param {Function} callback
  * @returns {Function}

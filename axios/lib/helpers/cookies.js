@@ -3,29 +3,34 @@
 var utils = require('./../utils');
 
 module.exports = utils.isStandardBrowserEnv()
-    ? // Standard browser envs support document.cookie
+    ? // 标准浏览器环境支持 document.cookie
       (function standardBrowserEnv() {
           return {
               write: function write(name, value, expires, path, domain, secure) {
                   var cookie = [];
                   cookie.push(name + '=' + encodeURIComponent(value));
 
+                  // cookie过期时间
                   if (utils.isNumber(expires)) {
                       cookie.push('expires=' + new Date(expires).toGMTString());
                   }
 
+                  // cookie限制路径
                   if (utils.isString(path)) {
                       cookie.push('path=' + path);
                   }
 
+                  // cookie限制域名
                   if (utils.isString(domain)) {
                       cookie.push('domain=' + domain);
                   }
 
+                  // 只支持https协议
                   if (secure === true) {
                       cookie.push('secure');
                   }
 
+                  // cookie拼接
                   document.cookie = cookie.join('; ');
               },
 
@@ -39,7 +44,7 @@ module.exports = utils.isStandardBrowserEnv()
               }
           };
       })()
-    : // Non standard browser env (web workers, react-native) lack needed support.
+    : // 非标准浏览器环境中不支持辅助, 例如（web-worker，react-native）
       (function nonStandardBrowserEnv() {
           return {
               write: function write() {},

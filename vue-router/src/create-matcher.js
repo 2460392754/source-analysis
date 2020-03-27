@@ -6,7 +6,7 @@ import { createRouteMap } from './create-route-map';
 import { normalizeLocation } from './util/location';
 
 /**
- * 创建路由匹配器
+ * 创建 路由匹配器对象
  * @param {Array} routes 路径属性列表
  * @param {*} router 路由
  */
@@ -24,8 +24,8 @@ export function createMatcher(routes, router) {
     /**
      * 获取 路由信息对象
      * @param {string|Object} raw 类`route`对象(当前激活的路由信息对象)
-     * @param {undefined} currentRoute 当前路由
-     * @param {undefined} redirectedFrom 来自重定向的源路径
+     * @param {*} currentRoute 当前路由
+     * @param {*} redirectedFrom 来自重定向的源路径
      */
     function match(raw, currentRoute, redirectedFrom) {
         // 规范化地址

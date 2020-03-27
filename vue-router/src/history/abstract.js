@@ -9,8 +9,13 @@ export class AbstractHistory extends History {
      * @param {string} base 基路径
      */
     constructor(router, base) {
+        // 运行父类的构造函数
         super(router, base);
+
+        // 初始化栈
         this.stack = [];
+
+        // 初始化栈的下标
         this.index = -1;
     }
 
@@ -21,6 +26,7 @@ export class AbstractHistory extends History {
      * @param {Function} onAbort 当前路由被终止运行时运行的回调函数
      */
     push(location, onComplete, onAbort) {
+        // 调用父类的路由跳转
         this.transitionTo(
             location,
             (route) => {
@@ -40,6 +46,7 @@ export class AbstractHistory extends History {
      * @param {Function} onAbort 当前路由被终止运行时运行的回调函数
      */
     replace(location, onComplete, onAbort) {
+        // 调用父类的路由跳转
         this.transitionTo(
             location,
             (route) => {

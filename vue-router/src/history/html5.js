@@ -28,18 +28,17 @@ export class HTML5History extends History {
         // 初始化 完整路径
         const initLocation = getLocation(this.base);
 
-        // 绑定事件 [https://developer.mozilla.org/zh-CN/docs/Web/API/Window/popstate_event]
+        // 绑定事件
         window.addEventListener('popstate', (e) => {
             const current = this.current;
             const location = getLocation(this.base);
 
-            //// Avoiding first `popstate` event dispatched in some browsers but first
-            //// history route not updated since async guard at the same time.
             // 如果 路由是初始状态，且路径也没有发生改变 就停止继续运行函数
             if (this.current === START && location === initLocation) {
                 return;
             }
 
+            // 调用父类的路由跳转
             this.transitionTo(location, (route) => {
                 if (supportsScroll) {
                     handleScroll(router, route, current, true);
@@ -65,6 +64,7 @@ export class HTML5History extends History {
     push(location, onComplete, onAbort) {
         const { current: fromRoute } = this;
 
+        // 调用父类的路由跳转
         this.transitionTo(
             location,
             (route) => {
@@ -88,6 +88,7 @@ export class HTML5History extends History {
     replace(location, onComplete, onAbort) {
         const { current: fromRoute } = this;
 
+        // 调用父类的路由跳转
         this.transitionTo(
             location,
             (route) => {

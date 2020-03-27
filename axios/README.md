@@ -1,6 +1,6 @@
 # axios
 
-## 版本
+## 信息
 
 地址：[github/axios@0.19.0](https://github.com/axios/axios/tree/v0.19.0) (2020-01-15)
 

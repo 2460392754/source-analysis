@@ -15,10 +15,16 @@ export default class VueRouter {
     constructor(options = {}) {
         this.app = null;
         this.apps = [];
+
+        // VueRouter 配置项数据
         this.options = options;
+
+        // 3个全局钩子容器
         this.beforeHooks = [];
         this.resolveHooks = [];
         this.afterHooks = [];
+
+        // 创建路由匹配器对象
         this.matcher = createMatcher(options.routes || [], this);
 
         // 设置默认值
@@ -48,10 +54,10 @@ export default class VueRouter {
 
             // 浏览器的`hash`
             case 'hash':
-                this.history = new HashHistory(this, options.base, this.fallback);
+                this.history = new HashHistory(this, options.base, this.x);
                 break;
 
-            // NodeJs环境
+            // 非浏览器环境
             case 'abstract':
                 this.history = new AbstractHistory(this, options.base);
                 break;
@@ -84,7 +90,7 @@ export default class VueRouter {
 
     /**
      * 初始化
-     * @param {Vue} app vue实例对象
+     * @param {Vue} app 组件实例对象
      */
     init(app) {
         // 在非生产环境中判断 'VueRouter'插件 是否已经注册'Vue'实例对象中
@@ -95,23 +101,18 @@ export default class VueRouter {
                     `before creating root instance.`
             );
 
+        // 保存组件实例对象
         this.apps.push(app);
 
-        // 销毁组件实例中
-        // TODO: 没找到'hook:destroyed'的事件注册来源, 猜测是Vue插件自己封装的注册事件
+        // 注册Vue的destroyed生命钩子，当组件销毁时，删除apps栈中的引用
         app.$once('hook:destroyed', () => {
-            //// clean out app from this.apps array once destroyed
             // 销毁apps栈中的这个实例
             const index = this.apps.indexOf(app);
             if (index > -1) this.apps.splice(index, 1);
-            //// ensure we still have a main app or null if no apps
-            //// we do not release the router so it can be reused
             // 当销毁的栈时最新的，则添加主栈或空
             if (this.app === app) this.app = this.apps[0] || null;
         });
 
-        //// main app previously initialized
-        //// return as we don't need to set up new history listener
         // 当路由不是首次运行，就结束
         if (this.app) {
             return;
@@ -139,7 +140,7 @@ export default class VueRouter {
             );
         }
 
-        // 注册 路由更新后运行的回调函数
+        // 注册 路由更新后运行的回调函数，更新路由记录
         history.listen((route) => {
             this.apps.forEach((app) => {
                 app._route = route;
@@ -157,7 +158,7 @@ export default class VueRouter {
         return registerHook(this.resolveHooks, fn);
     }
 
-    // 注册 路由离开直接的全局钩子
+    // 注册 路由离开之前的全局钩子
     afterEach(fn) {
         return registerHook(this.afterHooks, fn);
     }

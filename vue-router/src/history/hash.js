@@ -15,7 +15,6 @@ export class HashHistory extends History {
         // 运行父类的构造函数
         super(router, base);
 
-        //// check history fallback deeplinking
         // 运行环境不兼容其他路由模式被切换到`hash`模式，并验证地址
         if (fallback && checkFallback(this.base)) {
             return;
@@ -24,8 +23,6 @@ export class HashHistory extends History {
         ensureSlash();
     }
 
-    //// this is delayed until the app mounts
-    //// to avoid the hashchange listener being fired too early
     /**
      * 设置监听事件
      */

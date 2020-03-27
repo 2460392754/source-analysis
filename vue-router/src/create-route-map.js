@@ -3,7 +3,7 @@ import { cleanPath } from './util/path';
 import { assert, warn } from './util/warn';
 
 /**
- *
+ * 动态路由匹配
  * @param {Array} routes 路由属性列表
  * @param {undefined|any[]} oldPathList 路由记录中的`path`属性去重后的`path`数组容器
  * @param {undefined|*} oldPathMap 路由记录中的`path`属性做为键名去重后的路由记录对象容器

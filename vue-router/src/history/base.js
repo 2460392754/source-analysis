@@ -6,9 +6,7 @@ import { START, isSameRoute } from '../util/route';
 import { flatten, flatMapComponents, resolveAsyncComponents } from '../util/resolve-components';
 import { NavigationDuplicated } from './errors';
 
-/**
- * 给子类实现一些公共的属性和方法
- */
+/** 给子类实现一些公共的属性和方法 */
 export class History {
     /**
      * 构造函数
@@ -22,12 +20,17 @@ export class History {
         // 设置规范化的基路径
         this.base = normalizeBase(base);
 
-        //// start with a route object that stands for "nowhere"
         // 初始化的路由对象
         this.current = START;
         this.pending = null;
+
+        // 路由是否已被初始化
         this.ready = false;
+
+        // 初始化时调用的回调函数列表
         this.readyCbs = [];
+
+        // 初始化失败时调用的回调函数列表
         this.readyErrorCbs = [];
 
         // 错误回调函数列表
@@ -67,7 +70,7 @@ export class History {
     }
 
     /**
-     * 过度
+     * 核心跳转方法
      * @param {*} location 路由信息对象
      * @param {Function} onComplete 编译回调函数
      * @param {Function} onAbort 终止回调函数
@@ -78,8 +81,11 @@ export class History {
         this.confirmTransition(
             route,
             () => {
+                // 更新route对象
                 this.updateRoute(route);
                 onComplete && onComplete(route);
+
+                // 调用子类的方法更新url
                 this.ensureURL();
 
                 // 首次初始化路由
@@ -107,7 +113,7 @@ export class History {
     }
 
     /**
-     * 确认过度
+     * 二次封装，并处理钩子
      * @param {Object} route 路由信息对象
      * @param {Function} onComplete 编译回调函数
      * @param {Function} onAbort 终止回调函数
@@ -117,10 +123,6 @@ export class History {
 
         // 运行 注册的错误回调函数，或控制台提示警告信息
         const abort = (err) => {
-            //// after merging https://github.com/vuejs/vue-router/pull/2771 we
-            //// When the user navigates through history through back/forward buttons
-            //// we do not want to throw the error. We only throw it if directly calling
-            //// push/replace. That's why it's not included in isError
             // `err`不是`NavigationDuplicated`类实例化后的对象，且是 `Error`构造函数实例化后的对象
             if (!isExtendedError(NavigationDuplicated, err) && isError(err)) {
                 // 错误回调函数列表中存有函数
@@ -180,17 +182,17 @@ export class History {
             try {
                 hook(route, current, (to) => {
                     // 中断当前的路径跳转，或中断且注册错误回调
+                    // next(false) -> abort navigation, ensure current URL
                     if (to === false || isError(to)) {
-                        //// next(false) -> abort navigation, ensure current URL
                         this.ensureURL(true);
                         abort(to);
                     } else if (
-                        // 添加新路由
+                        // 添加或修改 路由
+                        // next('/') or next({ path: '/' }) -> redirect
                         typeof to === 'string' ||
                         (typeof to === 'object' &&
                             (typeof to.path === 'string' || typeof to.name === 'string'))
                     ) {
-                        //// next('/') or next({ path: '/' }) -> redirect
                         // 提示警告，并跳转路由
                         abort();
                         if (typeof to === 'object' && to.replace) {
@@ -199,7 +201,7 @@ export class History {
                             this.push(to);
                         }
                     } else {
-                        //// confirm transition and pass on the value
+                        // 运行下一个路由守卫
                         next(to);
                     }
                 });
@@ -215,8 +217,6 @@ export class History {
             const postEnterCbs = [];
             // 判断路由是否更新
             const isValid = () => this.current === route;
-            //// wait until async components are resolved before
-            //// extracting in-component enter guards
             // 获取 路由进入的路由守卫列表
             const enterGuards = extractEnterGuards(activated, postEnterCbs, isValid);
             // 列表尾部追加 组件和路由全部解析完后运行的全局钩子
@@ -224,7 +224,7 @@ export class History {
 
             // 运行新队列
             runQueue(queue, iterator, () => {
-                // TODO: 关于这个函数的运行机制
+                // TODO: 在怎样的状态下，队列运行之前的route会和现在的route不同
                 if (this.pending !== route) {
                     return abort();
                 }
@@ -252,7 +252,7 @@ export class History {
         // 运行 注册的回调函数
         this.cb && this.cb(route);
 
-        // 运行 路由离开直接的全局钩子
+        // 运行 路由离开之前的全局钩子
         this.router.afterHooks.forEach((hook) => {
             hook && hook(route, prev);
         });
@@ -289,7 +289,7 @@ function normalizeBase(base) {
 }
 
 /**
- * 确定队列
+ * 获取队列
  * @param {*} current 旧路由记录
  * @param {*} next 新路由记录
  * @returns {Object}
@@ -349,7 +349,6 @@ function extractGuards(records, name, bind, reverse) {
 function extractGuard(def, key) {
     // 通过vue组件构造器，把属性对象转化为实例对象
     if (typeof def !== 'function') {
-        // // extend now so that global mixins are applied.
         // 创建一个组件构造器
         def = _Vue.extend(def);
     }
@@ -414,11 +413,6 @@ function bindEnterGuard(guard, match, key, cbs, isValid) {
         return guard(to, from, (cb) => {
             if (typeof cb === 'function') {
                 cbs.push(() => {
-                    //// #750
-                    //// if a router-view is wrapped with an out-in transition,
-                    //// the instance may not have been registered at this time.
-                    //// we will need to poll for registration until current route
-                    //// is no longer valid.
                     poll(cb, match.instances, key, isValid);
                 });
             }

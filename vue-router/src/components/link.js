@@ -93,7 +93,7 @@ export default {
         // render函数默认参数
         const data = { class: classes };
 
-        // 设置 作用域插槽
+        // 获取 默认插槽
         const scopedSlot =
             !this.$scopedSlots.$hasNormal &&
             this.$scopedSlots.default &&
@@ -105,12 +105,12 @@ export default {
                 isExactActive: classes[exactActiveClass]
             });
 
-        // 处理 作用域插槽
+        // 处理 默认插槽
         if (scopedSlot) {
             if (scopedSlot.length === 1) {
                 return scopedSlot[0];
 
-                //
+                // link标签里添加了1个以上的深度为1的标签
             } else if (scopedSlot.length > 1 || !scopedSlot.length) {
                 if (process.env.NODE_ENV !== 'production') {
                     warn(
@@ -118,6 +118,8 @@ export default {
                         `RouterLink with to="${this.to}" is trying to use a scoped slot but it didn't provide exactly one child. Wrapping the content with a span element.`
                     );
                 }
+
+                // 在span标签中内渲染默认插槽的内容
                 return scopedSlot.length === 0 ? h() : h('span', {}, scopedSlot);
             }
         }
@@ -127,34 +129,43 @@ export default {
             data.on = on;
             data.attrs = { href };
         } else {
-            // find the first <a> child and apply listener and href
+            // 查找首个a标签
             const a = findAnchor(this.$slots.default);
+
+            // 插槽中添加了a标签
             if (a) {
-                // in case the <a> is a static node
+                // 在vue中设置当前节点为非静态节点
                 a.isStatic = false;
+                // 浅拷贝数据
                 const aData = (a.data = extend({}, a.data));
+                // 初始化默认值
                 aData.on = aData.on || {};
-                // transform existing events in both objects into arrays so we can push later
+
+                // 遍历a标签事件
                 for (const event in aData.on) {
                     const handler = aData.on[event];
+
+                    // 如果a标签的和router-link标签都有相同的事件名称，就转换成数据函数，格式统一
                     if (event in on) {
                         aData.on[event] = Array.isArray(handler) ? handler : [handler];
                     }
                 }
-                // append new listeners for router-link
+
+                // 遍历router-link标签事件
                 for (const event in on) {
+                    // 处理格式
                     if (event in aData.on) {
-                        // on[event] is always a function
                         aData.on[event].push(on[event]);
                     } else {
                         aData.on[event] = handler;
                     }
                 }
 
+                // 浅拷贝
                 const aAttrs = (a.data.attrs = extend({}, a.data.attrs));
                 aAttrs.href = href;
             } else {
-                // doesn't have <a> child, apply listener to self
+                // 没找到a标签，直接绑定事件
                 data.on = on;
             }
         }
@@ -197,14 +208,26 @@ function guardEvent(e) {
     return true;
 }
 
+/**
+ * 递归遍历查找首个a标签
+ * @param {DOM} children
+ * @returns {DOM}
+ */
 function findAnchor(children) {
+    // 非空
     if (children) {
         let child;
+
+        // 遍历兄弟节点
         for (let i = 0; i < children.length; i++) {
             child = children[i];
+
+            // 判断当前标签
             if (child.tag === 'a') {
                 return child;
             }
+
+            // 递归查找
             if (child.children && (child = findAnchor(child.children))) {
                 return child;
             }

@@ -84,7 +84,7 @@ function addRouteRecord(pathList, pathMap, nameMap, route, parent, matchAs) {
     // 获取 规范化后的路径
     const normalizedPath = normalizePath(path, parent, pathToRegexpOptions.strict);
 
-    // 路由路径是否开启 “区分大小写”
+    // 路由路径是否开启"区分大小写", 会覆盖掉高级路由匹配模式中的`sensitive`属性配置
     if (typeof route.caseSensitive === 'boolean') {
         pathToRegexpOptions.sensitive = route.caseSensitive;
     }
@@ -102,6 +102,7 @@ function addRouteRecord(pathList, pathMap, nameMap, route, parent, matchAs) {
         redirect: route.redirect,
         beforeEnter: route.beforeEnter,
         meta: route.meta || {},
+        // 根据命名视图设置格式
         props: route.props == null ? {} : route.components ? route.props : { default: route.props }
     };
 

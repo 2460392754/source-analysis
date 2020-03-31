@@ -92,6 +92,7 @@ export function createMatcher(routes, router) {
                 }
             }
         }
+
         // no match
         return _createRoute(null, location);
     }
@@ -202,16 +203,20 @@ export function createMatcher(routes, router) {
             location.params,
             `aliased route with path "${matchAs}"`
         );
+
         const aliasedMatch = match({
             _normalized: true,
             path: aliasedPath
         });
+
         if (aliasedMatch) {
             const matched = aliasedMatch.matched;
             const aliasedRecord = matched[matched.length - 1];
             location.params = aliasedMatch.params;
+
             return _createRoute(aliasedRecord, location);
         }
+
         return _createRoute(null, location);
     }
 
@@ -227,6 +232,7 @@ export function createMatcher(routes, router) {
             return redirect(record, redirectedFrom || location);
         }
 
+        // `record`是对象类型，且添加了`matchAs`属性（别名路径指向的真实路径）
         if (record && record.matchAs) {
             return alias(record, location, record.matchAs);
         }

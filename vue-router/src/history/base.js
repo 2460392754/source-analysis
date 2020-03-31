@@ -269,10 +269,10 @@ function normalizeBase(base) {
     if (!base) {
         // 运行环境是否是浏览器
         if (inBrowser) {
-            // TODO: 为啥要获取`base`标签的``herf`属性
+            // 可以从html中base标签的href属性获取到默认的基地址（注意vue渲染和vueRouter的加载时间）
             const baseEl = document.querySelector('base');
             base = (baseEl && baseEl.getAttribute('href')) || '/';
-            // strip full URL origin
+            // 删除掉可能存在的origin数据
             base = base.replace(/^https?:\/\/[^\/]+/, '');
         } else {
             base = '/';

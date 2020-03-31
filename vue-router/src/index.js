@@ -54,7 +54,7 @@ export default class VueRouter {
 
             // 浏览器的`hash`
             case 'hash':
-                this.history = new HashHistory(this, options.base, this.x);
+                this.history = new HashHistory(this, options.base, this.fallback);
                 break;
 
             // 非浏览器环境
@@ -118,8 +118,10 @@ export default class VueRouter {
             return;
         }
 
+        // 保存 vm
         this.app = app;
 
+        // 获取当前已设置的路由模式
         const history = this.history;
 
         // history模式

@@ -172,7 +172,7 @@ export function getHash() {
     let href = window.location.href;
     const index = href.indexOf('#');
 
-    // 相对路径是空（首页 => '/'）
+    // 相对路径是空（首页 => 'http://xxxxx' => '/'）
     if (index < 0) return '';
 
     href = href.slice(index + 1);

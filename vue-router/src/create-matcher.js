@@ -98,7 +98,7 @@ export function createMatcher(routes, router) {
     }
 
     /**
-     * 创建 重定向的 路由信息对象 (this.$route)
+     * 创建 重定向的 路由信息对象
      * @param {Object} record
      * @param {*} location
      */
@@ -106,9 +106,11 @@ export function createMatcher(routes, router) {
         // 缩短变量名
         const originalRedirect = record.redirect;
 
+        // 获取 需要重定向的地址
         let redirect =
             typeof originalRedirect === 'function'
-                ? originalRedirect(createRoute(record, location, null, router))
+                ? // routes: [{path:'/xxx', redirect: to => { return '/need-redirect-path'; } }]
+                  originalRedirect(createRoute(record, location, null, router))
                 : originalRedirect;
 
         // 格式统一
@@ -163,13 +165,12 @@ export function createMatcher(routes, router) {
         } else if (path) {
             // 把父子路由的相对地址合并
             const rawPath = resolveRecordPath(path, record);
-            // 2. resolve params
             const resolvedPath = fillParams(
                 rawPath,
                 params,
                 `redirect route with path "${rawPath}"`
             );
-            // 3. rematch with existing query and hash
+
             return match(
                 {
                     _normalized: true,
@@ -192,7 +193,7 @@ export function createMatcher(routes, router) {
     }
 
     /**
-     * 创建 路径别名的 路由信息对象 (this.$route)
+     * 创建 路径别名的 路由信息对象
      * @param {Object} record 路由记录
      * @param {Object} location
      * @param {undefined|string} matchAs 别名路径指向的真实路径
@@ -204,6 +205,7 @@ export function createMatcher(routes, router) {
             `aliased route with path "${matchAs}"`
         );
 
+        // 创建一个alias的路由信息对象
         const aliasedMatch = match({
             _normalized: true,
             path: aliasedPath

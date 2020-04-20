@@ -74,5 +74,6 @@ export function install(Vue) {
 
     const strats = Vue.config.optionMergeStrategies;
     // 使用Vue的自定义选项合并策略，路由的部分钩子使用与vue生命周期中的`created`相同的合并策略
+    // 如果子类和父类都拥有钩子选项，则将子类选项和父类选项合并
     strats.beforeRouteEnter = strats.beforeRouteLeave = strats.beforeRouteUpdate = strats.created;
 }
